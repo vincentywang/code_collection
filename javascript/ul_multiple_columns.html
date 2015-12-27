@@ -1,0 +1,61 @@
+
+<div>
+    <ul class="columns" data-columns="4">
+        <li>A</li>
+        <li>B</li>
+        <li>C</li>
+        <li>D</li>
+        <li>E</li>
+        <li>F</li>
+        <li>G</li>
+        <li>H</li>
+        <li>I</li>
+        <li>J</li>
+        <li>K</li>
+        <li>L</li>
+        <li>M</li>
+        <li>N</li>
+    </ul>
+</div>
+
+<style>
+ul {
+    float: left;
+    position: relative;
+    margin-right: 20px;
+}
+</style>
+
+<script>
+
+   $(function () {
+       var initialContainer = $('.columns'),
+           columnItems = $('.columns li'),
+           columns = null,
+           column = 1, // account for initial column
+           itemsPerColumn = null; //to save calc on each itt
+       function updateColumns() {
+           column = 0;
+           itemsPerColumn = (columnItems.length / columns.length);
+           columnItems.each(function (idx, el) {
+               if (idx !== 0 && idx > itemsPerColumn * (column + 1)) {
+                   column += 1;
+               }
+               $(columns.get(column)).append(el);
+           });
+       }
+
+       function setupColumns() {
+           columnItems.detach();
+           column++;
+           while (column <= initialContainer.data('columns')) {
+               initialContainer.clone().insertBefore(initialContainer);
+               column++;
+           }
+           columns = $('.columns');
+       }
+       setupColumns();
+       updateColumns();
+   });
+  
+</script>   
