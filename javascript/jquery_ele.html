@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+
+<div class="main">
+<div class="wrapper">
+<div class="inner">Some text</div>
+<div class="inner">Other text</div>
+</div>
+</div>
+
+<script>
+
+var $targetElement = $('body div.main');
+$targetElement.append(
+    $('<div/>', {'class': 'wrapper'}).append(
+        $('<div/>', {'class': 'inner'}).append(
+            $('<span/>', {text: 'Some text'})
+        )
+    ).append(
+        $('<div/>', {'class': 'inner'}).append(
+            $('<span/>', {text: 'Other text'})
+        )
+    )
+);
+
+</script>
+</body>
+</html>
