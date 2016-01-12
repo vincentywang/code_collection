@@ -1,0 +1,19 @@
+#text-in-middle {
+	width: 100%;
+}
+
+#text-in-middle .outer-wrapper {
+	width: 75%;
+}
+
+#text-in-middle .outer-wrapper .text-wrapper {
+	height: 100px;
+	width: 100%;
+}
+
+#text-in-middle .outer-wrapper .text-wrapper::after {
+	content: "content in the middle";
+	font-size: 2em;
+	margin: 0 auto;
+	padding-left: 20px;
+}

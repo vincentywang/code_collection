@@ -1,0 +1,8 @@
+@import url("./css_src/text_in_middle.css");
+
+.example_wrapper {
+	width: 600px;
+	margin: 0 auto;
+	background-color: wheat;
+	border: solid 1px red;
+}
