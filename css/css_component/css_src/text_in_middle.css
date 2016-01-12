@@ -1,19 +1,29 @@
+/**	
+ * in line element can't make horizontal centered 
+ * example: <span>, ::after{content: " ";};
+ */
+
+
+
 #text-in-middle {
 	width: 100%;
 }
 
 #text-in-middle .outer-wrapper {
-	width: 75%;
+	height: 200px;
+	width: 200px;
+	border: solid 2px red;
+	border-radius: 50%;
+	margin: 0 auto;
 }
 
 #text-in-middle .outer-wrapper .text-wrapper {
-	height: 100px;
-	width: 100%;
+	width: 36px;  /*this width is still hard code, not good*/
+	font-size: 1.8em;
+	/*margin: 0 auto;*/
+	position: relative;
+	top: 50%;
+	left: 50%;
+  transform: translateY(-50%) translateX(-50%);
 }
 
-#text-in-middle .outer-wrapper .text-wrapper::after {
-	content: "content in the middle";
-	font-size: 2em;
-	margin: 0 auto;
-	padding-left: 20px;
-}
