@@ -1,0 +1,913 @@
+<html>
+<head>      <base href="http://ejohn.org/files/jquery-original.html">
+      <style>
+        form input, form textarea, form button, form submit { cursor: not-allowed !important; }
+      </style>
+      <script>(function() {
+  var base_url = "http://ejohn.org/files/jquery-original.html";
+  history.replaceState(null, '', base_url.replace(/^https?:\//, window.location.origin) + window.location.hash);
+}());
+</script>
+      <script>(function() {
+  var cookies = []
+
+  var get = function() {
+    return cookies.join('; ')
+  }
+
+  var set = function(value) {
+    cookies.push(value.toString().split(';')[0])
+  }
+
+  if (Object.defineProperty && (!document.hasOwnProperty('cookie') || Object.getOwnPropertyDescriptor(document, 'cookie').configurable)) {
+    Object.defineProperty(document, 'cookie', {get: get, set: set})
+  } else if (document.__defineGetter__) {
+    document.__defineGetter__('cookie', get)
+    document.__defineSetter__('cookie', set)
+  }
+}())
+</script>
+      <script>(function() {
+  window.addEventListener('hashchange', function(e) {
+    var Genius = window['com.genius.Genius']
+    if (Genius) {
+      return Genius.onhashchange(e)
+    }
+  })
+
+  window.addEventListener('popstate', function(e) {
+    var Genius = window['com.genius.Genius']
+    if (Genius) {
+      return Genius.onpopstate(e)
+    }
+  })
+})()
+</script>
+      <script>(function() {
+  var matches_host = function(expected_host, test_host) {
+    var regexp = new RegExp('(^|\\.)' + expected_host.replace(/\./g, '\\.') + '$')
+    return regexp.test(test_host)
+  }
+
+  var is_wrapped = function(location) {
+    return matches_host('genius.it', location.hostname)
+  }
+
+  var points_at_source_location = function(location) {
+    return matches_host(source_location.hostname, location.hostname)
+  }
+
+  var location_for = function(url) {
+    var a = document.createElement('a')
+    a.href = url
+    return a
+  }
+
+  var source_location = location_for('http://ejohn.org/files/jquery-original.html')
+
+  if (!is_wrapped(window.location)) return
+
+  var AjaxObject = window.XMLHttpRequest || window.ActiveXObject
+  if (!AjaxObject) return
+
+  var original_open = AjaxObject.prototype.open
+
+  AjaxObject.prototype.open = function() {
+    var args = Array.prototype.slice.call(arguments)
+    var url = args[1]
+
+    var ajax_location = location_for(url)
+
+    if (!ajax_location.hostname) {
+      ajax_location.hostname = source_location.hostname
+    }
+
+    if (points_at_source_location(ajax_location) && !is_wrapped(ajax_location)) {
+      ajax_location.pathname = ajax_location.hostname + ajax_location.pathname
+      ajax_location.hostname = 'genius.it'
+    }
+
+    args[1] = ajax_location.href
+
+    return original_open.apply(this, args)
+  }
+})()
+</script>
+      <script async crossorigin id="s14t-genius-injection" src="//genius.com/bookmarklets/injection.js?s=proxy"></script>
+      <script>document.getElementById('s14t-genius-injection').onload = function() {
+  var host = "genius.com"
+  var $ = window['com.genius.Genius'].jQuery;
+  var MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver;
+  var source_url = $('base').attr('href')
+
+    var can_safely_access_href_prop = function($link) {
+      try {
+        return typeof $link.prop('href') === 'string'
+      } catch(e) {
+        return false
+      }
+    }
+
+  var replace_anchor = function ($link) {
+    if (!can_safely_access_href_prop($link)) return
+
+    var href = $link.prop('href')
+
+    if (href.indexOf(source_url + '#') === 0 || href.indexOf(source_url + '/#') === 0) {
+      return $link.prop('href', window.location.href + $link[0].hash)
+    }
+
+    if (!/^https?:$/.test($link[0].protocol)) return
+
+    var page_path = href.replace(/^https?:\/\//i, '')
+    if (window !== window.parent) {
+      var new_href = window.location.protocol + '//' + host + '/' + page_path
+    } else {
+      var link_has_same_host = $link.prop('hostname') === window.location.hostname;
+      var new_href = link_has_same_host ? href : window.location.origin + '/' + page_path;
+    }
+
+    $link.attr('href', new_href)
+  };
+
+  $(function () {
+    $('a').each(function () { replace_anchor($(this)) })
+
+    if (typeof MutationObserver === 'function') {
+      new MutationObserver(function (mutations) {
+        var $all_nodes = $()
+        for (var i = 0; i < mutations.length; i++) {
+          $all_nodes = $all_nodes.add(mutations[i].addedNodes)
+        }
+        $all_nodes.find('a').not('.rg_annotation_link a').each(function () {
+          replace_anchor($(this))
+        })
+      }).observe(document.body, { childList: true, subtree: true })
+    }
+  })
+
+  $(document).on('focus', 'form :input', function() {
+    $(this).prop('disabled', true).
+      attr('placeholder', "This feature doesn't work with Genius")
+    return false
+  })
+}
+</script>
+      <script>(function() {
+  var upstream_url = "ejohn.org/files/jquery-original.html";
+  var annotation_id, annotator_login, filter;
+
+  var annotation_match = /(?:#|&)annotations[\/:](\d+)/.exec(location.hash);
+  if (annotation_match) annotation_id = annotation_match[1];
+
+  var annotator_match = /(?:#|&)annotator[\/:](\w+)/.exec(location.hash);
+  if (annotator_match) annotator_login = annotator_match[1];
+
+  var filter_match = /(?:#|&)filter[\/:]([\w:]+)/.exec(location.hash);
+  if (filter_match) filter = filter_match[1];
+
+  new_path = window.location.origin + '/';
+  if (annotation_id) new_path += annotation_id + '/';
+  new_path += upstream_url;
+
+  if (annotator_login) {
+    if (new_path.indexOf('?') === -1) {
+      new_path += '?'
+    } else {
+      new_path += '&'
+    }
+    new_path += 'annotator=' + annotator_login;
+  } else if (filter) {
+    if (new_path.indexOf('?') === -1) {
+      new_path += '?'
+    } else {
+      new_path += '&'
+    }
+    new_path += 'filter=' + filter;
+  }
+
+  history.replaceState(null, '', new_path);
+})()
+</script>
+<style>
+div {
+    font-family: Consolas, Courier New;
+    white-space: pre;
+}
+</style>
+<title data-genius-original-content="">Genius | Annotate the world</title>
+<meta property="og:title" content="Genius-annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;">
+<meta name="twitter:title" content="Genius-annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;">
+<meta property="og:url" data-genius-original-content="" content="http://genius.it/ejohn.org/files/jquery-original.html">
+<meta property="og:type" content="website" data-genius-original-content="website">
+<meta property="og:description" content="An annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;" data-genius-original-content="An annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;">
+<meta name="twitter:description" content="An annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;" data-genius-original-content="An annotated version of &ldquo;http://ejohn.org/files/jquery-original.html&rdquo;">
+<meta property="og:site_name" content="ejohn.org" data-genius-original-content="ejohn.org">
+<meta name="twitter:site" content="@Genius">
+<meta name="twitter:card" content="summary" data-genius-original-content="summary">
+<meta property="og:image" content="http://assets.genius.com/images/sharable_snarly.png" data-genius-original-content="http://assets.genius.com/images/sharable_snarly.png">
+<meta name="twitter:image:src" content="http://assets.genius.com/images/sharable_snarly.png" data-genius-original-content="http://assets.genius.com/images/sharable_snarly.png">
+</head>
+<body>
+<p>The original jQuery source code, released Jan 14th, 2006 at BarCamp NYC.</p>
+<p><a href="http://genius.it/ejohn.org/files/jquery-original.html">View the annotations using Genius.</a> Not shown: <strong>Ajax module</strong>, <strong>FX module</strong>, <strong>Advanced Events Module</strong></p>
+<p><a href="http://ejohn.org/blog/annotated-version-of-the-original-jquery-release/">Blog post about this annotated source code.</a></p>
+<p><a href="http://ejohn.org/files/jquery-original.js">Raw source code</a></p>
+<div>/*</div>
+<div> * JQuery (http://jquery.com/)</div>
+<div> * By John Resig (http://ejohn.org/)</div>
+<div> * Under an Attribution, Share Alike License</div>
+<div> */</div>
+<div></div>
+<div>function $(a,c) {</div>
+<div>    if ( a == null ) return;</div>
+<div>    // Since we're using Prototype's $ function,</div>
+<div>    // be nice and have backwards compatability</div>
+<div>    if ( typeof Prototype != "undefined" &amp;&amp; a.constructor == String ) {</div>
+<div>        var re = new RegExp( "[^a-zA-Z0-9_-]" );</div>
+<div>        if ( !re.test(a) ) {</div>
+<div>            var c = ((c&amp;&amp;c.documentElement) || document);</div>
+<div>            if ( c.getElementsByTagName(a).length == 0 ) {</div>
+<div>                var obj = c.getElementById(a);</div>
+<div>                if ( obj != null ) return obj;</div>
+<div>            }</div>
+<div>        }</div>
+<div>    }</div>
+<div></div>
+<div>    // Load Dynamic Function List</div>
+<div>    var self = {</div>
+<div>        cur: $.Select(a,c),</div>
+<div>        </div>
+<div>        // The only two getters</div>
+<div>        size: function() {</div>
+<div>            return this.get().length;</div>
+<div>        },</div>
+<div>        get: function(i) {</div>
+<div>            if ( i == null )</div>
+<div>                return this.$$unclean ? $.sibling(this.$$unclean[0]) : this.cur;</div>
+<div>            else</div>
+<div>                return (this.get())[i];</div>
+<div>        },</div>
+<div></div>
+<div>        "_get": function(i) {</div>
+<div>            if ( i == null )</div>
+<div>                return this.cur;</div>
+<div>            else</div>
+<div>                return this.cur[i];</div>
+<div>        },</div>
+<div>        </div>
+<div>        each: function(f) {</div>
+<div>            for ( var i = 0; this.cur &amp;&amp; i &lt; this._get().length; i++ ) {</div>
+<div>                if ( this._get(i) ) {</div>
+<div>                    this._get(i).$$tmpFunc = f;</div>
+<div>                    this._get(i).$$tmpFunc(i);</div>
+<div>                    this._get(i).$$tmpFunc = null;</div>
+<div>                }</div>
+<div>            }</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        set: function(a,b) {</div>
+<div>            return this.each(function(){</div>
+<div>                if ( b == null )</div>
+<div>                    for ( var j in a )</div>
+<div>                        this[j] = a[j];</div>
+<div>                else {</div>
+<div>                    if ( b.constructor != String ) {</div>
+<div>                        for ( var i in b ) {    </div>
+<div>                            var c = $.Select(i,this);</div>
+<div>                            for ( var j in c )</div>
+<div>                                c[j][a] = b[i];</div>
+<div>                        }</div>
+<div>                    } else</div>
+<div>                      this[a] = b;</div>
+<div>                }</div>
+<div>            });</div>
+<div>        },</div>
+<div>        html: function(h) {</div>
+<div>            return this.set( "innerHTML", h );</div>
+<div>        },</div>
+<div>        // Deprecated</div>
+<div>        style: function(a,b){ return this.css(a,b); },</div>
+<div>        </div>
+<div>        css: function(a,b) {</div>
+<div>            return this.each(function(){</div>
+<div>                if ( !b )</div>
+<div>                    for ( var j in a )</div>
+<div>                        this.style[j] = a[j];</div>
+<div>                else</div>
+<div>                    this.style[a] = b;</div>
+<div>            });</div>
+<div>        },</div>
+<div>        toggle: function() {</div>
+<div>            return this.each(function(){</div>
+<div>                var d = $.getCSS(this,"display");</div>
+<div>                if ( d == "none" || d == '' )</div>
+<div>                    $(this).show();</div>
+<div>                else</div>
+<div>                    $(this).hide();</div>
+<div>            });</div>
+<div>        },</div>
+<div>        show: function(a) {</div>
+<div>            return this.each(function(){</div>
+<div>                this.style.display = this.$$oldblock ? this.$$oldblock : 'block';</div>
+<div>            });</div>
+<div>        },</div>
+<div>        hide: function(a) {</div>
+<div>            return this.each(function(){</div>
+<div>                this.$$oldblock = $.getCSS(this,"display");</div>
+<div>                this.style.display = 'none';</div>
+<div>            });</div>
+<div>        },</div>
+<div>        addClass: function(c) {</div>
+<div>            return this.each(function(){</div>
+<div>                if ($.hasWord(this,c)) return;</div>
+<div>                this.className += ( this.className.length &gt; 0 ? " " : "" ) + c;</div>
+<div>            });</div>
+<div>        },</div>
+<div>        removeClass: function(c) {</div>
+<div>            return this.each(function(){</div>
+<div>                if (!$.hasWord(this,c)) return;</div>
+<div>                var ret = "";</div>
+<div>                var s = this.className.split( " " );</div>
+<div>                for ( var i = 0; i &lt; s.length; i++ )</div>
+<div>                    if ( s[i] != c )</div>
+<div>                        ret += ( ret.length &gt; 0 ? " " : "" ) + s[i];</div>
+<div>                this.className = ret;</div>
+<div>            });</div>
+<div>        },</div>
+<div>        remove: function() {</div>
+<div>            this.each(function(){this.parentNode.removeChild( this );});</div>
+<div>            this.cur = [];</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        </div>
+<div>        wrap: function() {</div>
+<div>            var a = $.clean(arguments);</div>
+<div>            return this.each(function(){</div>
+<div>                var b = a[0].cloneNode(true);</div>
+<div>                this.parentNode.insertBefore( b, this );</div>
+<div>                while ( b.firstChild ) b = b.firstChild;</div>
+<div>                b.appendChild( this );</div>
+<div>            });</div>
+<div>        },</div>
+<div>        </div>
+<div>        append: function() {</div>
+<div>            var a = $.clean(arguments);</div>
+<div>            return this.each(function(){</div>
+<div>                for ( var i in a )</div>
+<div>                    if ( a[i].cloneNode != null )</div>
+<div>                    this.appendChild( a[i].cloneNode(true) );</div>
+<div>            });</div>
+<div>        },</div>
+<div></div>
+<div>        appendTo: function() {</div>
+<div>            var self = this;</div>
+<div>            var a = arguments;</div>
+<div>            return this.each(function(){</div>
+<div>                for ( var i = 0; i &lt; a.length; i++ ) {</div>
+<div>                    if ( self.$$unclean )</div>
+<div>                      $(a[i]).append( self.get() );</div>
+<div>                    else</div>
+<div>                      $(a[i]).append( this );</div>
+<div>                }</div>
+<div>            });</div>
+<div>        },</div>
+<div>        </div>
+<div>        prepend: function() {</div>
+<div>            var a = $.clean(arguments);</div>
+<div>            return this.each(function(){</div>
+<div>                for ( var i = a.length - 1; i &gt;= 0; i-- )</div>
+<div>                    this.insertBefore( a[i].cloneNode(true), this.firstChild );</div>
+<div>            });</div>
+<div>        },</div>
+<div>        </div>
+<div>        before: function() {</div>
+<div>            var a = $.clean(arguments);</div>
+<div>            return this.each(function(){</div>
+<div>                for ( var i in a )</div>
+<div>                    this.parentNode.insertBefore( a[i].cloneNode(true), this );</div>
+<div>            });</div>
+<div>        },</div>
+<div>        </div>
+<div>        after: function() {</div>
+<div>            var a = $.clean(arguments);</div>
+<div>            return this.each(function(){</div>
+<div>                for ( var i = a.length - 1; i &gt;= 0; i-- )</div>
+<div>                    this.parentNode.insertBefore( a[i].cloneNode(true), this.nextSibling );</div>
+<div>            });</div>
+<div>        },</div>
+<div>        </div>
+<div>        bind: function(t,f) {</div>
+<div>            return this.each(function(){addEvent(this,t,f);});</div>
+<div>        },</div>
+<div>        unbind: function(t,f) {</div>
+<div>            return this.each(function(){removeEvent(this,t,f);});</div>
+<div>        },</div>
+<div>        </div>
+<div>        find: function(t) {</div>
+<div>            var old = [], ret = [];</div>
+<div>            this.each(function(){</div>
+<div>                old.push( this );</div>
+<div>                ret = $.merge( ret, $.Select(t,this) );</div>
+<div>            });</div>
+<div>            this.old = old;</div>
+<div>            this.cur = ret;</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        end: function() {</div>
+<div>            this.cur = this.old;</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        filter: function(t) {</div>
+<div>            this.cur = $.filter(t,this.cur).r;</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        not: function(t) {</div>
+<div>            if ( t.constructor == String )</div>
+<div>                this.cur = $.filter(t,this.cur,false).r;</div>
+<div>            else</div>
+<div>                this.cur = $.grep(this.cur,function(a){return a != t;});</div>
+<div>            return this;</div>
+<div>        },</div>
+<div>        add: function(t) {</div>
+<div>            if ( t.constructor == String )</div>
+<div>                this.cur = $.merge(this.cur,$.Select(t));</div>
+<div>            else if ( t.constructor == Array )</div>
+<div>                this.cur = $.merge(this.cur,t);</div>
+<div>            else</div>
+<div>                this.cur = $.merge(this.cur,new Array(t));</div>
+<div>            return this;</div>
+<div>        }</div>
+<div>    };</div>
+<div>    for ( var i in $.fn ) {</div>
+<div>        if ( self[i] != null )</div>
+<div>            self["_"+i] = self[i];</div>
+<div>        self[i] = $.fn[i];</div>
+<div>    }</div>
+<div>    </div>
+<div>    if ( typeof Prototype != "undefined" &amp;&amp; a.constructor != String ) {</div>
+<div>        for ( var i in self ) {(function(j){</div>
+<div>            try {</div>
+<div>                if ( j.indexOf('on') != 0 || j == "onready" ) {</div>
+<div>                    a[j] = function() {</div>
+<div>                        return self[j].apply(self,arguments);</div>
+<div>                    };</div>
+<div>                }</div>
+<div>            } catch (e){}</div>
+<div>        })(i);}</div>
+<div>        return a;</div>
+<div>    }</div>
+<div>    </div>
+<div>    return self;</div>
+<div>}</div>
+<div></div>
+<div>function $C(a) {</div>
+<div>  if ( a.indexOf('&lt;') &gt;= 0 ) {</div>
+<div>    if ( a.indexOf('&lt;tr') &gt;= 0 ) {</div>
+<div>      var r = $C("table").html("&lt;tbody&gt;"+a+"&lt;/tbody&gt;");</div>
+<div>      r.$$unclean = r.get(0).childNodes[0].childNodes;</div>
+<div>    } else {</div>
+<div>      var r = $C("div").html(a);</div>
+<div>      r.$$unclean = r.get(0).childNodes;</div>
+<div>    }</div>
+<div>    return r;</div>
+<div>  } else {</div>
+<div>    return $(document.createElement(a),document);</div>
+<div>  }</div>
+<div>}</div>
+<div></div>
+<div>$.getCSS = function(e,p) {</div>
+<div>  if (e.style[p])</div>
+<div>    return e.style[p];</div>
+<div>  else if (e.currentStyle)</div>
+<div>    return e.currentStyle[p];</div>
+<div>  else if (document.defaultView &amp;&amp; document.defaultView.getComputedStyle) {</div>
+<div>    p = p.replace(/([A-Z])/g,"-$1");</div>
+<div>    p = p.toLowerCase();</div>
+<div>    return document.defaultView.getComputedStyle(e,"").getPropertyValue(p);</div>
+<div>  } else</div>
+<div>    return null;</div>
+<div>};</div>
+<div></div>
+<div>$.clean = function(a) {</div>
+<div>    var r = new Array();</div>
+<div>    for ( var i = 0; i &lt; a.length; i++ ) {</div>
+<div>        if ( a[i].constructor == String ) {</div>
+<div>            //a[i] = a[i].replace( /#([a-zA-Z0-9_-]+)/g, " id='$1' " );</div>
+<div>            //a[i] = a[i].replace( /\.([a-zA-Z0-9_-]+)/g, " class='$1' " );</div>
+<div>            var div = document.createElement("div");</div>
+<div>            div.innerHTML = a[i];</div>
+<div>            for ( var j = 0; j &lt; div.childNodes.length; j++ )</div>
+<div>                r.push( div.childNodes[j] );</div>
+<div>        } else if ( a[i].length ) {</div>
+<div>            for ( var j = 0; j &lt; a[i].length; j++ )</div>
+<div>                r.push( a[i][j] );</div>
+<div>        } else {</div>
+<div>            r.push( a[i] ); //.cloneNode(true) );</div>
+<div>        }</div>
+<div>    }</div>
+<div>    return r;</div>
+<div>};</div>
+<div></div>
+<div>$.g = {</div>
+<div>    '': "m[2] == '*' || a.nodeName.toUpperCase() == m[2].toUpperCase()",</div>
+<div>    '#': "a.id == m[2]",</div>
+<div>    ':': {</div>
+<div>        lt: "i &lt; m[3]-0",</div>
+<div>        gt: "i &gt; m[3]-0",</div>
+<div>        nth: "m[3] - 0 == i",</div>
+<div>        eq: "m[3] - 0 == i",</div>
+<div>        first: "i == 0",</div>
+<div>        last: "i == r.length - 1",</div>
+<div>        even: "i % 2 == 0",</div>
+<div>        odd: "i % 2 == 1",</div>
+<div>        "first-child": "$.sibling(a,0).cur",</div>
+<div>        "nth-child": "(m[3] == 'even'?$.sibling(a,m[3]).n % 2 == 0 :(m[3] == 'odd'?$.sibling(a,m[3]).n % 2 == 1:$.sibling(a,m[3]).cur))",</div>
+<div>        "last-child": "$.sibling(a,0,true).cur",</div>
+<div>        "nth-last-child": "$.sibling(a,m[3],true).cur",</div>
+<div>        "first-of-type": "$.ofType(a,0)",</div>
+<div>        "nth-of-type": "$.ofType(a,m[3])",</div>
+<div>        "last-of-type": "$.ofType(a,0,true)",</div>
+<div>        "nth-last-of-type": "$.ofType(a,m[3],true)",</div>
+<div>        "only-of-type": "$.ofType(a) == 1",</div>
+<div>        "only-child": "$.sibling(a).length == 1",</div>
+<div>        parent: "a.childNodes.length &gt; 0",</div>
+<div>        empty: "a.childNodes.length == 0",</div>
+<div>        lang: "a.lang == m[3]",</div>
+<div>        root: "a == ( a.ownerDocument ? a.ownerDocument : document ).documentElement",</div>
+<div>        contains: "(a.innerText || a.innerHTML).indexOf(m[3]) != -1",</div>
+<div>        visible: "(!a.type || a.type != 'hidden') &amp;&amp; ($.getCSS(a,'display') != 'none' &amp;&amp; $.getCSS(a,'visibility') != 'hidden')",</div>
+<div>        hidden: "(a.type &amp;&amp; a.type == 'hidden') || $.getCSS(a,'display') == 'none' || $.getCSS(a,'visibility') == 'hidden'",</div>
+<div>        enabled: "a.disabled == false",</div>
+<div>        disabled: "a.disabled",</div>
+<div>        checked: "a.checked",</div>
+<div>        indeterminate: "a.checked != null &amp;&amp; !a.checked"</div>
+<div>    },</div>
+<div>    ".": "$.hasWord(a.className,m[2]) || $.hasWord(a.getAttribute('class'),m[2])",</div>
+<div>    "@": {</div>
+<div>        "=": "a.getAttribute(m[3]) == m[4]",</div>
+<div>        "!=": "a.getAttribute(m[3]) != m[4]",</div>
+<div>        "~=": "$.hasWord(a.getAttribute(m[3]),m[4])",</div>
+<div>        "|=": "a.getAttribute(m[3])?a.getAttribute(m[3]).indexOf(m[4])==0:false",</div>
+<div>        "^=": "a.getAttribute(m[3])?a.getAttribute(m[3]).indexOf(m[4])==0:false",</div>
+<div>        "$=": "a.getAttribute(m[3]) != null ? a.getAttribute(m[3]).substr( a.getAttribute(m[3]).length - m[4].length, m[4].length ) == m[4] : false",</div>
+<div>        "*=": "a.getAttribute(m[3])?a.getAttribute(m[3]).indexOf(m[4]) != -1 : false",</div>
+<div>        "": "m[3] == '*' ? a.attributes.length &gt; 0 : a.getAttribute(m[3])"</div>
+<div>    },</div>
+<div>    "[": "$.Select(m[2],a).length &gt; 0"</div>
+<div>};</div>
+<div></div>
+<div>// Frequently-used Accessors</div>
+<div>window.cssQuery = $.Select;</div>
+<div>document.getElementsByClass = function(a){return $.Select("."+a)};</div>
+<div>document.getElementsBySelector = $.Select;</div>
+<div></div>
+<div>$.fn = {};</div>
+<div></div>
+<div>$.Select = function( t, context ) {</div>
+<div>  if ( context == null )</div>
+<div>    var context = document;</div>
+<div>    </div>
+<div>    if ( t.constructor != String )</div>
+<div>        return new Array( t );</div>
+<div>    </div>
+<div>    if ( t.indexOf("//") == 0 ) {</div>
+<div>        context = context.documentElement;</div>
+<div>        t = t.substr(2,t.length);</div>
+<div>    } else if ( t.indexOf("/") == 0 ) {</div>
+<div>        context = context.documentElement;</div>
+<div>        t = t.substr(1,t.length);</div>
+<div>        // Assume the root element is right :(</div>
+<div>        if ( t.indexOf('/') )</div>
+<div>            t = t.substr(t.indexOf('/'),t.length);</div>
+<div>    }</div>
+<div>    </div>
+<div>    // Make Xpath Axes Sane</div>
+<div>    var re = new RegExp( "/?descendant::", "i" );</div>
+<div>    t = t.replace( re, " " );</div>
+<div>    var re = new RegExp( "/?child::", "i" );</div>
+<div>    t = t.replace( re, "/" );</div>
+<div>    // If only...</div>
+<div>    //var re = new RegExp( "/?following-sibling::", "i" );</div>
+<div>    //t = t.replace( re, " + " );</div>
+<div>    var re = new RegExp( "/?preceding-sibling::", "i" );</div>
+<div>    t = t.replace( re, " ~ " );</div>
+<div>    var re = new RegExp( "/?self::", "i" );</div>
+<div>    t = t.replace( re, "" );</div>
+<div>    var re = new RegExp( "/?parent::", "i" );</div>
+<div>    t = t.replace( re, " .. " );</div>
+<div>    </div>
+<div>    // following</div>
+<div>    // preceding</div>
+<div>    // ancestor</div>
+<div>    // ancestor-or-self</div>
+<div>    // descendant-or-self</div>
+<div>    </div>
+<div>    var ret = new Array( context );</div>
+<div>  var done = new Array();</div>
+<div>    var last = null;</div>
+<div>  </div>
+<div>  while ( t.length &gt; 0 &amp;&amp; last != t ) {</div>
+<div>    var r = new Array();</div>
+<div>        last = t;</div>
+<div>    </div>
+<div>    t = $.cleanSpaces(t);</div>
+<div>    </div>
+<div>    var re = new RegExp( "^//", "i" );</div>
+<div>    t = t.replace( re, "" );</div>
+<div></div>
+<div>    if ( t.indexOf('..') == 0 || t.indexOf('/..') == 0 ) {</div>
+<div>            if ( t.indexOf('/') == 0 )</div>
+<div>                t = t.substr(1,t.length);</div>
+<div>      r = $.map( ret, function(a){ return a.parentNode; } );</div>
+<div>            t = t.substr(2,t.length);</div>
+<div>            t = $.cleanSpaces(t);</div>
+<div>    } else if ( t.indexOf('&gt;') == 0 || t.indexOf('/') == 0 ) {</div>
+<div>      r = $.map( ret, function(a){ return ( a.childNodes.length &gt; 0 ? $.sibling( a.firstChild ) : null ); } );</div>
+<div>            t = t.substr(1,t.length);</div>
+<div>            t = $.cleanSpaces(t);</div>
+<div>    } else if ( t.indexOf('+') == 0 ) {</div>
+<div>      r = $.map( ret, function(a){ return $.sibling(a).next; } );</div>
+<div>            t = t.substr(1,t.length);</div>
+<div>            t = $.cleanSpaces(t);</div>
+<div>    } else if ( t.indexOf('~') == 0 ) {</div>
+<div>      r = $.map( ret, function(a){</div>
+<div>        var r = new Array();</div>
+<div>        var s = $.sibling(a);</div>
+<div>        if ( s.n &gt; 0 )</div>
+<div>          for ( var i = s.n; i &lt; s.length; i++ )</div>
+<div>            r.push( s[i] );</div>
+<div>        return r;</div>
+<div>      } );</div>
+<div>            t = t.substr(1,t.length);</div>
+<div>            t = $.cleanSpaces(t);</div>
+<div>    } else if ( t.indexOf(',') == 0 || t.indexOf('|') == 0 ) {</div>
+<div>      if ( ret[0] == context ) ret.shift();</div>
+<div>      done = $.merge( done, ret );</div>
+<div>      r = ret = new Array( context );</div>
+<div>            t = " " + t.substr(1,t.length);</div>
+<div>    } else {</div>
+<div>      var re = new RegExp( "^([#.]?)([a-z0-9\\*-]*)", "i" );</div>
+<div>      var m = re.exec(t);</div>
+<div>            if ( m[1] == "#" ) {</div>
+<div>                var oid = document.getElementById(m[2]);</div>
+<div>                if ( oid != null ) r = [ oid ];</div>
+<div>                else r = [];</div>
+<div>            }</div>
+<div>            if ( m[2] == "" || m[1] == "." ) m[2] = "*";</div>
+<div>            else t = t.replace( re, "" );</div>
+<div>            for ( var i = 0; i &lt; ret.length; i++ ) {</div>
+<div>                var o = ret[i];</div>
+<div>                if ( o ) {</div>
+<div>                    switch( m[2] ) {</div>
+<div>                        case '*':</div>
+<div>                            r = $.merge( $.getAll(o), r );</div>
+<div>                        break;</div>
+<div>                        case 'text': case 'radio': case 'checkbox': case 'hidden':</div>
+<div>                        case 'button': case 'submit': case 'image': case 'password':</div>
+<div>                        case 'reset': case 'image': case 'file':</div>
+<div>                            r = $.merge( $.grep( o.getElementsByTagName( "input" ), </div>
+<div>                                        function(a){ return a.type == m[2] }), r );</div>
+<div>                        break;</div>
+<div>                        case 'input':</div>
+<div>                            r = $.merge( o.getElementsByTagName( "input" ), r );</div>
+<div>                            r = $.merge( o.getElementsByTagName( "select" ), r );</div>
+<div>                            r = $.merge( o.getElementsByTagName( "textarea" ), r );</div>
+<div>                        break;</div>
+<div>                        default:</div>
+<div>                            r = $.merge( o.getElementsByTagName( m[2] ), r );</div>
+<div>                        break;</div>
+<div>                    }</div>
+<div>                }</div>
+<div>            }</div>
+<div>    }</div>
+<div>        </div>
+<div>        var val = $.filter(t,r);</div>
+<div>        r = val.r;</div>
+<div>        t = val.t;</div>
+<div></div>
+<div>    t = $.cleanSpaces(t);</div>
+<div>    ret = r;</div>
+<div>  }</div>
+<div></div>
+<div>  if ( ret &amp;&amp; ret[0] == context ) ret.shift();</div>
+<div>  done = $.merge( done, ret );</div>
+<div>  return done;</div>
+<div>};</div>
+<div></div>
+<div>$.filter = function(t,r,not) {</div>
+<div>    var g = $.grep;</div>
+<div>    if ( not == false ) var g = function(a,f) {return $.grep(a,f,true);};</div>
+<div>    </div>
+<div>    while ( t.length &gt; 0 &amp;&amp; t.match(/^[:\\.#\\[a-zA-Z\\*]/) ) {</div>
+<div>        var re = new RegExp( "^\\[ *@([a-z0-9\\(\\)-]+) *([~!\\|\\*$^=]*) *'?\"?([^'\"]*)'?\"? *\\]", "i" );</div>
+<div>        var m = re.exec(t);</div>
+<div>        </div>
+<div>        if ( m != null ) {</div>
+<div>            m = new Array( '', '@', m[2], m[1], m[3] );</div>
+<div>        } else {</div>
+<div>            var re = new RegExp( "^(\\[) *([^\\]]*) *\\]", "i" );</div>
+<div>            var m = re.exec(t);</div>
+<div>            </div>
+<div>            if ( m == null ) {</div>
+<div>                var re = new RegExp( "^(:)([a-z0-9\\*-]*)\\( *[\"']?([^ \\)'\"]*)['\"]? *\\)", "i" );</div>
+<div>                var m = re.exec(t);</div>
+<div>                </div>
+<div>                if ( m == null ) {</div>
+<div>                    var re = new RegExp( "^([:\\.#]*)([a-z0-9\\*-]*)", "i" );</div>
+<div>                    var m = re.exec(t);</div>
+<div>                }</div>
+<div>            }</div>
+<div>        }</div>
+<div>        t = t.replace( re, "" );</div>
+<div>        </div>
+<div>        if ( m[1] == ":" &amp;&amp; m[2] == "not" )</div>
+<div>            r = $.filter(m[3],r,false).r;</div>
+<div>        else {</div>
+<div>            if ( $.g[m[1]].constructor == String )</div>
+<div>                var f = $.g[m[1]];</div>
+<div>            else if ( $.g[m[1]][m[2]] )</div>
+<div>                var f = $.g[m[1]][m[2]];</div>
+<div>                        </div>
+<div>            if ( f != null ) {</div>
+<div>                eval("f = function(a,i){return " + f + "}");</div>
+<div>                r = g( r, f );</div>
+<div>            }</div>
+<div>        }</div>
+<div>    }</div>
+<div>    return { r: r, t: t };</div>
+<div>};</div>
+<div></div>
+<div>$.cleanSpaces = function(t) {</div>
+<div>    var re = new RegExp("^\\s+");</div>
+<div>    t = t.replace( re, "" );</div>
+<div>    var re = new RegExp("\\s+$");</div>
+<div>    t = t.replace( re, "" );</div>
+<div>    return  t;</div>
+<div>};</div>
+<div></div>
+<div>$.ofType = function(a,n,e) {</div>
+<div>    var t = $.grep($.sibling(a),function(b){return b.nodeName == a.nodeName});</div>
+<div>    if ( e ) n = t.length - n - 1;</div>
+<div>    return n != null ? t[n] == a : t.length;</div>
+<div>};</div>
+<div></div>
+<div>$.sibling = function(a,n,e) {</div>
+<div>  var type = new Array();</div>
+<div>  var tmp = a.parentNode.childNodes;</div>
+<div>  for ( var i = 0; i &lt; tmp.length; i++ ) {</div>
+<div>    if ( tmp[i].nodeType == 1 )</div>
+<div>      type.push( tmp[i] );</div>
+<div>    if ( tmp[i] == a )</div>
+<div>      type.n = type.length - 1;</div>
+<div>  }</div>
+<div>  if ( e ) n = type.length - n - 1;</div>
+<div>  type.cur = ( type[n] == a );</div>
+<div>  type.prev = ( type.n &gt; 0 ? type[type.n - 1] : null );</div>
+<div>  type.next = ( type.n &lt; type.length - 1 ? type[type.n + 1] : null );</div>
+<div>  return type;</div>
+<div>};</div>
+<div></div>
+<div>$.hasWord = function(e,a) {</div>
+<div>  if ( e == null ) return false;</div>
+<div>    if ( e.className != null ) e = e.className;</div>
+<div>  var s = e.split( " " );</div>
+<div>  for ( var i = 0; i &lt; s.length; i++ )</div>
+<div>    if ( s[i] == a ) return true;</div>
+<div>  return false;</div>
+<div>};</div>
+<div></div>
+<div>$.getAll = function(o,r) {</div>
+<div>    if(!r) var r = new Array();</div>
+<div>    var s = o.childNodes;</div>
+<div>    for ( var i = 0; i &lt; s.length; i++ ) {</div>
+<div>        if ( s[i].nodeType == 1 ) {</div>
+<div>            r.push(s[i]);</div>
+<div>            $.getAll( s[i], r );</div>
+<div>        }</div>
+<div>    }</div>
+<div>    return r;</div>
+<div>};</div>
+<div></div>
+<div>$.merge = function(a,b) {</div>
+<div>  for ( var i = 0; i &lt; a.length; i++ ) {</div>
+<div>    var c = true;</div>
+<div>    for ( var j = 0; j &lt; b.length; j++ )</div>
+<div>      if ( a[i] == b[j] )</div>
+<div>        c = false;</div>
+<div>        if ( c )</div>
+<div>            b.push( a[i] );</div>
+<div>  }</div>
+<div>    return b;</div>
+<div>};</div>
+<div></div>
+<div>$.grep = function(a,f,s) {</div>
+<div>  var r = new Array();</div>
+<div>    if ( a != null )</div>
+<div>        for ( var i = 0; i &lt; a.length; i++ )</div>
+<div>            if ( (!s &amp;&amp; f(a[i],i)) || (s &amp;&amp; !f(a[i],i)) )</div>
+<div>                r.push( a[i] );</div>
+<div>  return r;</div>
+<div>};</div>
+<div></div>
+<div>$.map = function(a,f) {</div>
+<div>  var r = new Array();</div>
+<div>  for ( var i = 0; i &lt; a.length; i++ ) {</div>
+<div>    var t = f(a[i],i);</div>
+<div>    if ( t != null ) {</div>
+<div>      if ( t.constructor != Array ) t = new Array(t);</div>
+<div>            r = $.merge( t, r );</div>
+<div>        }</div>
+<div>  }</div>
+<div>  return r;</div>
+<div>};</div>
+<div></div>
+<div>// addEvent/removeEvent</div>
+<div>// Original by Dean Edwards</div>
+<div>// Modified by John Resig</div>
+<div></div>
+<div>function addEvent(element, type, handler) {</div>
+<div>    if (!handler.$$guid) handler.$$guid = addEvent.guid++;</div>
+<div>    if (!element.events) element.events = {};</div>
+<div>    var handlers = element.events[type];</div>
+<div>    if (!handlers) {</div>
+<div>        handlers = element.events[type] = {};</div>
+<div>        if (element["on" + type])</div>
+<div>            handlers[0] = element["on" + type];</div>
+<div>    }</div>
+<div>    handlers[handler.$$guid] = handler;</div>
+<div>    element["on" + type] = handleEvent;</div>
+<div>};</div>
+<div>addEvent.guid = 1;</div>
+<div></div>
+<div>function removeEvent(element, type, handler) {</div>
+<div>    if (element.events) {</div>
+<div>        if (type &amp;&amp; element.events[type]) {</div>
+<div>            if ( handler ) {</div>
+<div>                delete element.events[type][handler.$$guid];</div>
+<div>            } else {</div>
+<div>                for ( var i in element.events[type] )</div>
+<div>                    removeEvent( element, type, element.events[type][i] );</div>
+<div>            }</div>
+<div>        } else {</div>
+<div>            for ( var i in element.events )</div>
+<div>                removeEvent( element, i );</div>
+<div>        }</div>
+<div>    }</div>
+<div>};</div>
+<div></div>
+<div>function handleEvent(event) {</div>
+<div>    var returnValue = true;</div>
+<div>    event = event || fixEvent(window.event);</div>
+<div>    var handlers = [];</div>
+<div>    for ( var i in this.events[event.type] )</div>
+<div>        handlers.push( this.events[event.type][i] );</div>
+<div>    </div>
+<div>    //var handlers = this.events[event.type];</div>
+<div>    for (var i in handlers) {</div>
+<div>        try {</div>
+<div>            if ( handlers[i].constructor == Function ) {</div>
+<div>                this.$$handleEvent = handlers[i];</div>
+<div>                if (this.$$handleEvent(event) === false) {</div>
+<div>                    event.preventDefault();</div>
+<div>                    event.stopPropagation();</div>
+<div>                    returnValue = false;</div>
+<div>                }</div>
+<div>            }</div>
+<div>        } catch(e){}</div>
+<div>    }</div>
+<div>    return returnValue;</div>
+<div>};</div>
+<div></div>
+<div>function fixEvent(event) {</div>
+<div>    event.preventDefault = fixEvent.preventDefault;</div>
+<div>    event.stopPropagation = fixEvent.stopPropagation;</div>
+<div>    return event;</div>
+<div>};</div>
+<div>fixEvent.preventDefault = function() {</div>
+<div>    this.returnValue = false;</div>
+<div>};</div>
+<div>fixEvent.stopPropagation = function() {</div>
+<div>    this.cancelBubble = true;</div>
+<div>};</div>
+<div></div>
+<div>// Move to module</div>
+<div></div>
+<div>$.fn.text = function(e) {</div>
+<div>    if ( !e ) var e = this.cur;</div>
+<div>    var t = "";</div>
+<div>    for ( var j = 0; j &lt; e.length; j++ ) {</div>
+<div>        for ( var i = 0; i &lt; e[j].childNodes.length; i++ )</div>
+<div>            t += e[j].childNodes[i].nodeType != 1 ?</div>
+<div>                e[j].childNodes[i].nodeValue :</div>
+<div>                $.fn.text(e[j].childNodes[i].childNodes);</div>
+<div>    }</div>
+<div>    return t;</div>
+<div>};</div>
+<div></div>
+<div>setTimeout(function(){</div>
+<div>  if ( typeof Prototype != "undefined" &amp;&amp; $.g == null &amp;&amp; $.clean == null )</div>
+<div>    throw "Error: You are overwriting jQuery, please include jQuery last.";</div>
+<div>}, 1000);</div>
+</body>
+</html>
