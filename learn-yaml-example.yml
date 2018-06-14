@@ -1,0 +1,51 @@
+# There are two file extensions for YAML
+## .yaml or .yml
+# YAML can present three type of data
+## variable | list | object
+
+# varify file at http://www.yamllint.com/
+# reference https://www.youtube.com/watch?v=cdLNKUoMc6c
+
+person:
+  name: "mike"                    # double quote string
+  nick_name: &name "speed"        # set name anchor cau reuse below 
+  occuption: 'programmer'         # single quote string
+  age: 23                         # integer
+  format_age: !!float 23          # convert integer to float
+  gpa: 3.5                        # float
+  format_gpa: !!str 3.5           # convert float to string
+  fav_num: 1e+10                  # Exponentiation
+  male: true                      # boolean
+  birthday: 1994-02-06            # have to be ISO 8601 format for date
+  hobbies:                        # sample list
+    - hiking
+    - movies
+    - riding bike
+  movies: ["Dark Knight", 'Good will Hunting'] # sample list different format
+  friends:                        # complex list with object
+    - name: "Steph"               # object 1
+      age: 22
+    - {name: "Adam", age: 22}     # object 2
+    -
+      name: "joe"                 # object 3
+      age: 23
+  description: >                  # will concatenate the below text
+    Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+    tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+    quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+    consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+    cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+    proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+  signature: |                    # will perserve the belw text format
+    Mike
+    Giraffe Academy
+    email - giraffeacademy@gmail.com
+  id: *name                       # reuse anchor
+
+  base: &base                     # set anchor a object
+    var1: value1
+    var2: value2
+
+  foo:
+    <<: *base                     # reuse anchor
+    var3: value3 
